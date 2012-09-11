@@ -1,0 +1,8 @@
+{
+  "name" : "calabash",
+  "version" : "0.0.1",
+  "author" : { "name": "sam l'ecuyer" },
+  "licenses": [
+    { "type": "MIT" }
+  ]
+}
