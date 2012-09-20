@@ -1,4 +1,4 @@
-/*! calabash - v0.0.1 - 2012-09-11
+/*! calabash - v0.0.1 - 2012-09-20
 * Copyright (c) 2012 sam l'ecuyer; Licensed MIT */
 
 (function(global, undefined) {
@@ -256,18 +256,25 @@ function rejected(reason) {
 	return freeze(res);
 }
 
-var taskQueue = [];
-var notifier = new global.MessageChannel();
-notifier.port1.onmessage = function() {
-	var task = taskQueue.shift();
-	task();
-};
+var enqueue;
+if (global.MessageChannel) {
+	var taskQueue = [];
+	var notifier = new global.MessageChannel();
+	notifier.port1.onmessage = function() {
+		var task = taskQueue.shift();
+		task();
+	};
 
-K.enqueue = enqueue;
-function enqueue(task) {
-	taskQueue.push(task);
-	notifier.port2.postMessage(undefined);
+	enqueue = function(task) {
+		taskQueue.push(task);
+		notifier.port2.postMessage(undefined);
+	};
+} else {
+	enqueue = function(task) {
+		setTimeout(task, 1);
+	};
 }
+K.enqueue = enqueue;
 
 K.isPromise = isPromise;
 function isPromise(value) {
